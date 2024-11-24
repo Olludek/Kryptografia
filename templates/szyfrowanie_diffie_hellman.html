@@ -1,0 +1,193 @@
+{% extends 'base.html' %} {% block content %}
+
+<!-- Informacja o protokole Diffie-Hellmana -->
+<h2>Szyfrowanie Diffiego-Hellmana</h2>
+
+<p class="note-text">
+  Protokół Diffiego-Hellmana umożliwia dwóm stronom wymianę klucza szyfrującego
+  bez potrzeby przesyłania go bezpośrednio. Każda ze stron generuje klucz
+  prywatny i na jego podstawie oblicza klucz publiczny. Następnie na podstawie
+  klucza publicznego drugiej strony i swojego klucza prywatnego generowany jest
+  wspólny klucz szyfrujący.
+</p>
+
+<!-- Formularze dla Alicji i Boba -->
+<div class="form-container">
+  <!-- Sekcja Alicja -->
+  <div class="form-column">
+    <h3>Dane Alicji</h3>
+    <form id="alice-form">
+      <!-- Pole do wprowadzenia wartości g (podstawa) -->
+      <label for="g_value">Wartość g (podstawa):</label>
+      <input type="number" id="g_value" name="g_value" />
+      <button type="button" onclick="generateRandomG()">Generuj</button>
+      <br /><br />
+
+      <!-- Pole do wprowadzenia wartości p (moduł) -->
+      <label for="p_value">Wartość p (moduł):</label>
+      <input type="number" id="p_value" name="p_value" />
+      <button type="button" onclick="generateRandomP()">Generuj</button>
+      <br /><br />
+
+      <!-- Pole do wprowadzenia prywatnego klucza Alicji -->
+      <label for="alice_private_key">Prywatny klucz Alicji:</label>
+      <input type="number" id="alice_private_key" required />
+      <br /><br />
+
+      <!-- Pole do wprowadzenia tekstu do zaszyfrowania -->
+      <label for="alice_text">Tekst do zaszyfrowania:</label>
+      <input
+        type="text"
+        id="alice_text"
+        placeholder="Wprowadź tekst"
+        required
+      />
+      <br /><br />
+
+      <!-- Przycisk do wysłania danych do Boba -->
+      <button type="button" onclick="sendToBob()">Wyślij do Boba</button>
+    </form>
+  </div>
+
+  <!-- Sekcja Bob -->
+  <div class="form-column">
+    <h3>Dane Boba</h3>
+    <form id="bob-form">
+      <!-- Pole do wprowadzenia prywatnego klucza Boba -->
+      <label for="bob_private_key">Prywatny klucz Boba:</label>
+      <input type="number" id="bob_private_key" required />
+      <br /><br />
+
+      <!-- Przycisk do odbioru danych od Alicji -->
+      <button type="button" onclick="receiveFromAlice()">
+        Odbierz od Alicji
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Sekcja obliczeń kluczy i wyników -->
+<div class="form-full-width" style="margin-top: 20px">
+  <h2>Obliczenia i wspólny klucz:</h2>
+  <form id="results-form">
+    <!-- Pole do wyświetlenia klucza publicznego Alicji -->
+    <label for="alice_public_key"
+      >Klucz publiczny Alicji (A = g^a mod p):</label
+    >
+    <input type="text" id="alice_public_key" readonly />
+    <br /><br />
+
+    <!-- Pole do wyświetlenia klucza publicznego Boba -->
+    <label for="bob_public_key">Klucz publiczny Boba (B = g^b mod p):</label>
+    <input type="text" id="bob_public_key" readonly />
+    <br /><br />
+
+    <!-- Pole do wyświetlenia wspólnego klucza Alicji -->
+    <label for="shared_key_alice"
+      >Wspólny klucz Alicji (keya = B^a mod p):</label
+    >
+    <input type="text" id="shared_key_alice" readonly />
+    <br /><br />
+
+    <!-- Pole do wyświetlenia wspólnego klucza Boba -->
+    <label for="shared_key_bob">Wspólny klucz Boba (keyb = A^b mod p):</label>
+    <input type="text" id="shared_key_bob" readonly />
+    <br /><br />
+
+    <!-- Pole do wyświetlenia zaszyfrowanego tekstu -->
+    <label for="encrypted_text">Tekst zaszyfrowany:</label>
+    <input type="text" id="encrypted_text" readonly />
+    <br /><br />
+
+    <!-- Pole do wyświetlenia odszyfrowanego tekstu przez Boba -->
+    <label for="decrypted_text">Tekst odszyfrowany przez Boba:</label>
+    <input type="text" id="decrypted_text" readonly />
+  </form>
+</div>
+
+<!-- Skrypty JavaScript do obsługi formularzy i obliczeń -->
+<script>
+  // Funkcja do generowania losowej wartości g (podstawa)
+  function generateRandomG() {
+    document.getElementById("g_value").value =
+      Math.floor(Math.random() * 10) + 2; // Generuje wartość od 2 do 11
+  }
+
+  // Funkcja do generowania losowej wartości p (moduł)
+  function generateRandomP() {
+    document.getElementById("p_value").value =
+      Math.floor(Math.random() * 100) + 50; // Generuje wartość od 50 do 149
+  }
+
+  // Funkcja do obliczania potęgi z modulo: (base^exp) % mod
+  function modPow(base, exp, mod) {
+    let result = 1;
+    while (exp > 0) {
+      if (exp % 2 === 1) {
+        result = (result * base) % mod;
+      }
+      base = (base * base) % mod;
+      exp = Math.floor(exp / 2);
+    }
+    return result;
+  }
+
+  // Funkcja, gdy Alicja wysyła wiadomość do Boba
+  function sendToBob() {
+    const g = parseInt(document.getElementById("g_value").value);
+    const p = parseInt(document.getElementById("p_value").value);
+    const alicePrivateKey = parseInt(
+      document.getElementById("alice_private_key").value
+    );
+    const aliceText = document.getElementById("alice_text").value;
+
+    // Sprawdzenie, czy wszystkie pola są wypełnione
+    if (g && p && alicePrivateKey && aliceText) {
+      // Obliczenie klucza publicznego Alicji: A = g^a mod p
+      const alicePublicKey = modPow(g, alicePrivateKey, p);
+      document.getElementById("alice_public_key").value = alicePublicKey;
+
+      // Zaszyfrowanie tekstu przez Boba za pomocą wspólnego klucza
+      // Tutaj przykładowo używamy kodowania Base64 jako szyfrowania
+      document.getElementById("encrypted_text").value = btoa(aliceText);
+      alert("Wiadomość zaszyfrowana. Teraz Bob może ją odebrać.");
+    } else {
+      alert("Upewnij się, że wszystkie wartości są wprowadzone.");
+    }
+  }
+
+  // Funkcja, gdy Bob odbiera wiadomość od Alicji i odszyfrowuje
+  function receiveFromAlice() {
+    const g = parseInt(document.getElementById("g_value").value);
+    const p = parseInt(document.getElementById("p_value").value);
+    const bobPrivateKey = parseInt(
+      document.getElementById("bob_private_key").value
+    );
+    const alicePublicKey = parseInt(
+      document.getElementById("alice_public_key").value
+    );
+
+    // Sprawdzenie, czy wszystkie pola są wypełnione
+    if (g && p && bobPrivateKey && alicePublicKey) {
+      // Obliczenie klucza publicznego Boba: B = g^b mod p
+      const bobPublicKey = modPow(g, bobPrivateKey, p);
+      document.getElementById("bob_public_key").value = bobPublicKey;
+
+      // Obliczenie wspólnego klucza Alicji i Boba: keya = B^a mod p, keyb = A^b mod p
+      const sharedKeyAlice = modPow(alicePublicKey, bobPrivateKey, p);
+      const sharedKeyBob = modPow(alicePublicKey, bobPrivateKey, p);
+
+      document.getElementById("shared_key_alice").value = sharedKeyAlice;
+      document.getElementById("shared_key_bob").value = sharedKeyBob;
+
+      // Odczytanie zaszyfrowanego tekstu
+      const encryptedText = document.getElementById("encrypted_text").value;
+      // Odszyfrowanie tekstu za pomocą wspólnego klucza (tu jako przykładowe odszyfrowanie Base64)
+      document.getElementById("decrypted_text").value = atob(encryptedText);
+    } else {
+      alert("Upewnij się, że Bob posiada wszystkie wymagane dane.");
+    }
+  }
+</script>
+
+{% endblock %}

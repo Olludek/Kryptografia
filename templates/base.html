@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kryptografia i Teoria Kodów</title>
+    <style>
+      /* Stylowanie dla zewnętrznego kontenera */
+      .container {
+        width: 1400px;
+        height: 1000px;
+        margin: 18px auto; /* Wyśrodkowanie całości na stronie */
+        background-color: #c1c0c3;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden; /* Ukrycie wszelkich wychodzących elementów */
+      }
+
+      /* Stylowanie dla topbara */
+      .topbar {
+        width: 100%;
+        height: 50px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        line-height: 50px;
+        font-size: 20px;
+        position: absolute;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+      }
+
+      /* Stylowanie dla sidebaru */
+      .sidebar {
+        width: 200px;
+        height: 950px; /* Dopasowanie do wysokości kontenera pomniejszonej o topbar */
+        background-color: #444;
+        color: #fff;
+        position: absolute;
+        top: 50px;
+        left: 0;
+        padding-top: 20px;
+        box-sizing: border-box;
+        text-align: center;
+      }
+
+      .sidebar a {
+        display: block;
+        color: #fff;
+        padding: 10px;
+        text-decoration: none;
+      }
+
+      .sidebar a:hover {
+        background-color: #555;
+      }
+
+      /* Stylowanie dla głównej zawartości */
+      .content {
+        width: 1100px;
+        height: 900px;
+        background-color: #ffffff;
+        position: absolute;
+        top: 70px;
+        left: 250px;
+        padding: 20px;
+        box-sizing: border-box;
+        color: #333;
+        text-align: center;
+        border-radius: 8px;
+        overflow: auto; /* Dodane przewijanie dla zawartości */
+      }
+
+      /* Stylowanie dla całości strony */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+      }
+
+      /* Dodaj klasę dla wiadomości sukcesu */
+      .success-message {
+        color: green;
+        font-weight: bold;
+        font-size: 22px;
+      }
+
+      .note-text {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        background-color: #f9f9f9;
+        text-align: justify;
+        padding: 10px 15px; /* Dodatkowe odstępy wewnętrzne */
+        border-left: 4px solid #329c29; /* Pionowa linia w kolorze akcentu */
+        border-radius: 5px; /* Zaokrąglone rogi */
+        margin-bottom: 15px; /* Odstęp od innych elementów */
+      }
+
+      /* Stylizacja pola wyboru (select) */
+      select {
+        width: 220px;
+        padding: 3px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        background-color: #f9f9f9;
+        color: #333;
+        outline: none;
+        transition: all 0.3s ease;
+      }
+
+      select:focus {
+        border-color: #66afe9;
+        background-color: #e6f7ff;
+      }
+
+      /* Stylizacja przycisku submit */
+      input[type="submit"] {
+        width: 220px;
+        padding: 3px;
+        border-radius: 5px;
+        background-color: #000000;
+        color: white;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      input[type="submit"]:hover {
+        background-color: #393939;
+      }
+
+      /* Stylizacja dla kontenera formularzy */
+      .form-container {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+      }
+
+      /* Stylizacja dla każdej kolumny formularza */
+      .form-column {
+        width: 48%;
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Stylizacja dla pełnego formularza (szerokość 100%) */
+      .form-full-width {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      button {
+        padding: 5px 10px 5px 10px;
+        border-radius: 5px;
+        background-color: #000000;
+        color: white;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #393939;
+      }
+
+      /* Stylowanie dla certyfikatów */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        color: #333;
+      }
+
+      .form-full-width {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+
+      .cert-info,
+      .cert-chain-info {
+        background-color: #eef;
+        padding: 20px;
+        border: 1px solid #99c;
+        border-radius: 5px;
+        margin-top: 20px;
+      }
+
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      li {
+        margin-bottom: 5px;
+      }
+
+      .error-message {
+        color: red;
+        font-weight: bold;
+      }
+
+      .success-message {
+        color: green;
+        font-weight: bold;
+      }
+
+      textarea {
+        width: 100%;
+        resize: vertical;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="topbar"></div>
+
+      <div class="sidebar">
+        <a href="/">HOME</a>
+        <a href="/szyfrowanie_cezara">Cezara</a>
+        <a href="/szyfrowanie_vigenerea">Vigenère'a </a>
+        <a href="/szyfrowanie_rail_fence">Przeskoku </a>
+        <a href="/szyfrowanie_des"> DES </a>
+        <a href="/szyfrowanie_aes"> AES </a>
+        <a href="/szyfrowanie_diffie_hellman"> Diffie-Hellman </a>
+        <a href="/szyfrowanie_rsa"> RSA </a>
+        <a href="/podpis_cyfrowy"> Podpis cyfrowy </a>
+        <a href="/certyfikat"> Certyfikaty </a>
+      </div>
+
+      <div class="content">{% block content %}{% endblock %}</div>
+    </div>
+  </body>
+</html>

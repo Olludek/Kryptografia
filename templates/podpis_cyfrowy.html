@@ -1,0 +1,84 @@
+{% extends 'base.html' %} {% block content %}
+
+<!-- Informacja o podpisie cyfrowym -->
+<p class="note-text">
+  Podpis cyfrowy umożliwia weryfikację autentyczności oraz integralności
+  dokumentów. Proces ten polega na obliczeniu funkcji skrótu (hash) dokumentu
+  PDF, a następnie podpisaniu tego skrótu za pomocą klucza prywatnego RSA.
+  Odbiorca może zweryfikować podpis, używając klucza publicznego nadawcy.
+</p>
+
+<!-- Sekcja Generowania Podpisu Cyfrowego -->
+<div class="form-full-width">
+  <h2>Generowanie podpisu cyfrowego:</h2>
+  <form
+    method="POST"
+    action="/podpis_cyfrowy/generuj"
+    enctype="multipart/form-data"
+  >
+    <!-- Pole do wyboru pliku PDF -->
+    <label for="file">Wybierz plik PDF:</label>
+    <input type="file" id="file" name="file" accept=".pdf" required />
+    <br /><br />
+
+    <!-- Przycisk do generowania podpisu -->
+    <input type="submit" value="Generuj Podpis" />
+  </form>
+
+  <!-- Wyświetlanie wygenerowanego podpisu, jeśli istnieje -->
+  {% if podpis %}
+  <h3 class="success-message">Podpis został wygenerowany:</h3>
+  <textarea readonly rows="5" cols="80">{{ podpis }}</textarea>
+  <br />
+  <!-- Formularz do pobrania podpisu jako plik -->
+  <form method="POST" action="/podpis_cyfrowy/pobierz_podpis">
+    <!-- Pole ukryte zawierające podpis do pobrania -->
+    <input type="hidden" name="podpis" value="{{ podpis }}" />
+    <button type="submit">Pobierz Podpis</button>
+  </form>
+  {% endif %}
+</div>
+
+<br />
+
+<!-- Sekcja Weryfikacji Podpisu Cyfrowego -->
+<div class="form-full-width">
+  <h2>Weryfikacja podpisu cyfrowego:</h2>
+  <form
+    method="POST"
+    action="/podpis_cyfrowy/weryfikuj"
+    enctype="multipart/form-data"
+  >
+    <!-- Pole do wyboru pliku PDF do weryfikacji -->
+    <label for="file_verify">Wybierz plik PDF:</label>
+    <input
+      type="file"
+      id="file_verify"
+      name="file_verify"
+      accept=".pdf"
+      required
+    />
+    <br /><br />
+
+    <!-- Pole do wklejenia podpisu w formacie Base64 -->
+    <label for="podpis_verify">Wklej podpis (base64):</label>
+    <textarea
+      id="podpis_verify"
+      name="podpis_verify"
+      rows="5"
+      cols="80"
+      required
+    ></textarea>
+    <br /><br />
+
+    <!-- Przycisk do weryfikacji podpisu -->
+    <input type="submit" value="Weryfikuj Podpis" />
+  </form>
+
+  <!-- Wyświetlanie wyniku weryfikacji, jeśli istnieje -->
+  {% if weryfikacja %}
+  <h3 class="success-message">{{ weryfikacja }}</h3>
+  {% endif %}
+</div>
+
+{% endblock %}

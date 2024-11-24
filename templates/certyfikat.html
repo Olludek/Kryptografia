@@ -1,0 +1,103 @@
+<!-- templates/certyfikat.html -->
+
+{% extends 'base.html' %} {% block content %}
+
+<h1>Przeglądarka Certyfikatów</h1>
+
+<p class="note-text">
+  Viewer certyfikatów umożliwia przeglądanie i analizę certyfikatów X.509.
+  Możesz przesłać certyfikat oraz jego łańcuch, aby zobaczyć szczegółowe
+  informacje oraz zależności między nimi.
+</p>
+<!-- Formularz przesyłania certyfikatu -->
+<div class="form-full-width">
+  <h2>Wczytaj Certyfikat:</h2>
+  <form method="POST" action="/certyfikat" enctype="multipart/form-data">
+    <!-- Wybór typu certyfikatu -->
+    <label for="cert_type">Typ certyfikatu:</label>
+    <select id="cert_type" name="cert_type" required>
+      <option value="single">Jeden certyfikat</option>
+      <option value="chain">Łańcuch certyfikatów</option>
+    </select>
+    <br /><br />
+
+    <!-- Pole do wyboru pliku certyfikatu -->
+    <label for="cert_file">Wybierz plik:</label>
+    <input
+      type="file"
+      id="cert_file"
+      name="cert_file"
+      accept=".pem,.crt,.cer,.der"
+      required
+    />
+    <br /><br />
+
+    <!-- Przycisk do przesłania certyfikatu -->
+    <input type="submit" value="Wczytaj Certyfikat" />
+  </form>
+
+  <!-- Wyświetlanie błędów, jeśli istnieją -->
+  {% if error %}
+  <p class="error-message">{{ error }}</p>
+  {% endif %}
+</div>
+
+<br />
+
+<!-- Wyświetlanie informacji o pojedynczym certyfikacie -->
+{% if cert_info %}
+<div class="cert-info">
+  <h2>Informacje o Certyfikacie:</h2>
+  <ul>
+    <li><strong>Subiekt:</strong> {{ cert_info.subject }}</li>
+    <li><strong>Wystawca:</strong> {{ cert_info.issuer }}</li>
+    <li><strong>Numer seryjny:</strong> {{ cert_info.serial_number }}</li>
+    <li><strong>Wersja:</strong> {{ cert_info.version }}</li>
+    <li>
+      <strong>Data ważności (od):</strong> {{ cert_info.not_valid_before }}
+    </li>
+    <li>
+      <strong>Data ważności (do):</strong> {{ cert_info.not_valid_after }}
+    </li>
+    <li>
+      <strong>Algorytm podpisu:</strong> {{ cert_info.signature_algorithm }}
+    </li>
+    <li><strong>Klucz publiczny:</strong> {{ cert_info.public_key }}</li>
+  <!--</ul>
+  <h3>Rozszerzenia:</h3>
+  <ul>
+    {% for ext in cert_info.extensions %}
+    <li><strong>{{ ext.name }} ({{ ext.oid }}):</strong> {{ ext.value }}</li>
+    {% endfor %}
+  </ul>  -->
+</div>
+{% endif %}
+
+<!-- Wyświetlanie informacji o łańcuchu certyfikatów -->
+{% if cert_chain_info %}
+<div class="cert-chain-info">
+  <h2>Informacje o Łańcuchu Certyfikatów:</h2>
+  {% for cert in cert_chain_info %}
+  <div class="cert-info">
+    <h3>Certyfikat {{ loop.index }}:</h3>
+    <ul>
+      <li><strong>Subiekt:</strong> {{ cert.subject }}</li>
+      <li><strong>Wystawca:</strong> {{ cert.issuer }}</li>
+      <li><strong>Numer seryjny:</strong> {{ cert.serial_number }}</li>
+      <li><strong>Wersja:</strong> {{ cert.version }}</li>
+      <li><strong>Data ważności (od):</strong> {{ cert.not_valid_before }}</li>
+      <li><strong>Data ważności (do):</strong> {{ cert.not_valid_after }}</li>
+      <li><strong>Algorytm podpisu:</strong> {{ cert.signature_algorithm }}</li>
+      <li><strong>Klucz publiczny:</strong> {{ cert.public_key }}</li>
+   <!-- </ul>
+    <h4>Rozszerzenia:</h4>
+    <ul>
+      {% for ext in cert.extensions %}
+      <li><strong>{{ ext.name }} ({{ ext.oid }}):</strong> {{ ext.value }}</li>
+      {% endfor %}
+    </ul>  -->
+  </div>
+  <hr />
+  {% endfor %}
+</div>
+{% endif %} {% endblock %}

@@ -1,0 +1,147 @@
+{% extends 'base.html' %} {% block content %}
+
+<!-- Informacja o algorytmie RSA -->
+<p class="note-text">
+  RSA to popularny algorytm szyfrowania, który zabezpiecza dane dzięki użyciu
+  dwóch kluczy: publicznego do szyfrowania i prywatnego do odszyfrowywania.
+  Działa na zasadzie asymetryczności, co oznacza, że zaszyfrowanej wiadomości
+  nie da się łatwo odszyfrować bez znajomości odpowiedniego klucza prywatnego.
+  Klucz publiczny jest dostępny dla wszystkich, ale klucz prywatny zna tylko
+  właściciel i to on zapewnia bezpieczeństwo danych. Algorytm opiera się na
+  mnożeniu dużych liczb pierwszych, co sprawia, że jest bardzo trudny do
+  złamania bez ogromnych mocy obliczeniowych. RSA jest wykorzystywany w wielu
+  miejscach, np. do szyfrowania danych przesyłanych przez internet (tak jak w
+  HTTPS) oraz do tworzenia podpisów cyfrowych, które potwierdzają autentyczność
+  dokumentów. Choć RSA jest bardzo bezpieczny, jest wolniejszy od szyfrowania
+  symetrycznego i wymaga długich kluczy, aby skutecznie chronić dane. W
+  przyszłości algorytm może być zagrożony przez rozwój komputerów kwantowych,
+  które mogłyby szybciej złamać jego zabezpieczenia.
+</p>
+
+<!-- Sekcja Generowania Kluczy RSA -->
+<div class="form-container">
+  <!-- Formularz do generowania nowych kluczy RSA -->
+  <div class="form-column">
+    <form action="{{ url_for('generuj_klucze_rsa') }}" method="GET">
+      <!-- Przycisk do generowania nowej pary kluczy -->
+      <button type="submit" class="button">Generuj nową parę kluczy</button>
+    </form>
+
+    <!-- Wyświetlanie wygenerowanych kluczy, jeśli istnieją -->
+    {% if private_key and public_key %}
+    <p><strong>Klucz publiczny:</strong></p>
+    <textarea readonly style="width: 100%; height: 80px">
+{{ public_key }}</textarea
+    >
+    <br />
+    <p><strong>Klucz prywatny:</strong></p>
+    <textarea readonly style="width: 100%; height: 80px">
+{{ private_key }}</textarea
+    >
+    {% endif %}
+  </div>
+
+  <!-- Formularz do szyfrowania/deszyfrowania ręcznego -->
+  <div class="form-column">
+    <h2>Dane wprowadzane ręcznie:</h2>
+    <form id="rsa-form" method="POST" action="{{ url_for('szyfrowanie_rsa') }}">
+      <!-- Pole do wprowadzenia tekstu jawnego -->
+      <label for="text">Tekst jawny:</label>
+      <textarea id="text" name="text" style="width: 100%; height: 80px">
+{{ text }}</textarea
+      >
+      <br /><br />
+
+      <!-- Pole do wyświetlenia tekstu zaszyfrowanego -->
+      <label for="result">Tekst zaszyfrowany:</label>
+      <textarea
+        id="result"
+        name="result"
+        readonly
+        style="width: 100%; height: 80px"
+      >
+{{ result }}</textarea
+      >
+      <br /><br />
+
+      <!-- Przyciski do szyfrowania i deszyfrowania -->
+      <button type="button" onclick="submitForm('szyfruj')">Szyfruj</button>
+      <button type="button" onclick="submitForm('deszyfruj')">Deszyfruj</button>
+    </form>
+  </div>
+</div>
+
+<!-- Formularz do szyfrowania/deszyfrowania plików tekstowych -->
+<div class="form-full-width">
+  <h2>Szyfrowanie pliku tekstowego:</h2>
+  <form
+    id="rsa-file-form"
+    method="POST"
+    action="{{ url_for('szyfrowanie_rsa_file') }}"
+    enctype="multipart/form-data"
+  >
+    <!-- Pole do wyboru pliku tekstowego -->
+    <label for="file">Plik tekstowy:</label>
+    <input type="file" id="file" name="file" accept=".txt" required />
+    <br /><br />
+
+    <!-- Wybór operacji: szyfruj lub deszyfruj -->
+    <label for="file_operation">Wybierz operację:</label>
+    <select id="file_operation" name="operation">
+      <option value="szyfruj">Szyfruj</option>
+      <option value="deszyfruj">Deszyfruj</option>
+    </select>
+    <br /><br />
+
+    <!-- Przycisk do przesłania pliku i wykonania operacji -->
+    <button type="submit">Prześlij i wykonaj operację</button>
+  </form>
+</div>
+
+<!-- Skrypt JavaScript do obsługi formularza ręcznego -->
+<script>
+  // Funkcja do obsługi przesyłania formularza ręcznego
+  function submitForm(operation) {
+    const form = document.getElementById("rsa-form");
+
+    // Sprawdzenie, czy pole ukryte dla operacji już istnieje
+    let operationInput = document.getElementById("operation");
+    if (!operationInput) {
+      // Tworzenie pola ukrytego dla operacji
+      operationInput = document.createElement("input");
+      operationInput.setAttribute("type", "hidden");
+      operationInput.setAttribute("id", "operation");
+      operationInput.setAttribute("name", "operation");
+      form.appendChild(operationInput);
+    }
+    // Ustawienie wartości operacji na podstawie klikniętego przycisku
+    operationInput.value = operation;
+
+    // Wysyłanie formularza za pomocą Fetch API
+    fetch(form.action, {
+      method: "POST",
+      body: new FormData(form),
+    })
+      .then((response) => response.text())
+      .then((html) => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+
+        // Pobranie nowych wartości z odpowiedzi serwera
+        const newResult = doc.getElementById("result").value;
+        const newText = doc.getElementById("text").value;
+
+        if (operation === "szyfruj") {
+          // Jeśli operacja to szyfrowanie, aktualizacja pola wyniku i czyszczenie pola tekstowego
+          document.getElementById("result").value = newResult;
+          document.getElementById("text").value = "";
+        } else {
+          // Jeśli operacja to deszyfrowanie, aktualizacja pola tekstowego i czyszczenie pola wyniku
+          document.getElementById("text").value = newResult;
+          document.getElementById("result").value = "";
+        }
+      });
+  }
+</script>
+
+{% endblock %}

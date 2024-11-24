@@ -1,0 +1,92 @@
+{% extends 'base.html' %} {% block content %}
+
+<!-- Informacja o szyfrze Rail Fence -->
+<p class="note-text">
+  Szyfr Rail Fence, czyli szyfr przeskoku, to metoda szyfrowania, w której tekst
+  zapisuje się w zygzakowatym wzorze na kilku poziomach zwanych szynami.
+  Użytkownik wybiera liczbę szyn, co wpływa na sposób rozmieszczenia liter –
+  zapisuje się je od góry do dołu, a następnie z powrotem do góry, tworząc wzór
+  przypominający literę "V". Po zapisaniu tekstu w ten sposób odczytuje się go
+  poziomami, co tworzy zaszyfrowaną wersję wiadomości. Szyfr Rail Fence jest
+  prosty, ale skutecznie ilustruje podstawy szyfrowania.
+</p>
+
+<!-- Formularz do szyfrowania/deszyfrowania ręcznego -->
+<div class="form-full-width">
+  <h2>Dane wprowadzane ręcznie:</h2>
+  <form method="POST" action="/szyfrowanie_rail_fence">
+    <!-- Pole do wprowadzenia tekstu -->
+    <label for="text">Wprowadź tekst:</label>
+    <input type="text" id="text" name="text" value="{{ text }}" required />
+    <br /><br />
+
+    <!-- Pole do wprowadzenia liczby szyn -->
+    <label for="key">Wprowadź liczbę szyn:</label>
+    <input type="number" id="key" name="key" value="{{ key }}" required />
+    <br /><br />
+
+    <!-- Wybór operacji: szyfruj lub deszyfruj -->
+    <label for="operation">Wybierz operację:</label>
+    <select id="operation" name="operation" required>
+      <option value="szyfruj">Szyfruj</option>
+      <option value="deszyfruj">Deszyfruj</option>
+    </select>
+    <br /><br />
+
+    <!-- Przycisk do wykonania operacji -->
+    <input type="submit" value="Wykonaj" style="width: 200px" />
+  </form>
+
+  <!-- Wyświetlanie wyniku operacji oraz wizualizacji, jeśli istnieją -->
+  {% if result %}
+  <h2 class="success-message">Wynik: {{ result }}</h2>
+  {% if visualization %}
+  <h3>Wizualizacja w zygzak:</h3>
+  <pre>
+{% for row in visualization %}
+{{ row | join(" ") }}
+{% endfor %}
+</pre
+  >
+  {% endif %} {% endif %}
+</div>
+<br />
+
+<!-- Formularz do szyfrowania/deszyfrowania pliku tekstowego -->
+<div class="form-full-width">
+  <h2>Przesłany plik txt:</h2>
+  <form
+    method="POST"
+    action="/szyfrowanie_rail_fence_file"
+    enctype="multipart/form-data"
+  >
+    <!-- Pole do wyboru pliku tekstowego -->
+    <label for="file">Wybierz plik tekstowy:</label>
+    <input type="file" id="file" name="file" accept=".txt" required />
+    <br /><br />
+
+    <!-- Pole do wprowadzenia liczby szyn -->
+    <label for="key_file">Wprowadź liczbę szyn:</label>
+    <input
+      type="number"
+      id="key_file"
+      name="key_file"
+      value="{{ key_file }}"
+      required
+    />
+    <br /><br />
+
+    <!-- Wybór operacji: szyfruj lub deszyfruj -->
+    <label for="operation_file">Wybierz operację:</label>
+    <select id="operation_file" name="operation_file" required>
+      <option value="szyfruj">Szyfruj</option>
+      <option value="deszyfruj">Deszyfruj</option>
+    </select>
+    <br /><br />
+
+    <!-- Przycisk do szyfrowania i pobrania pliku -->
+    <input type="submit" value="Szyfruj i pobierz plik" style="width: 200px" />
+  </form>
+</div>
+
+{% endblock %}

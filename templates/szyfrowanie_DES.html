@@ -1,0 +1,188 @@
+{% extends 'base.html' %} 
+{% block content %}
+
+<!-- Informacja o szyfrowaniu DES -->
+<p class="note-text">
+  Szyfrowanie DES (Data Encryption Standard) to symetryczny algorytm blokowy,
+  wykorzystujący 8-bajtowy klucz do przetwarzania danych w blokach 64-bitowych.
+  ECB szyfruje każdy blok danych niezależnie, przekształcając 64-bitowy blok
+  wejściowy do tej samej długości wyjściowej; każdy identyczny blok zaszyfrowany
+  będzie miał taką samą postać, co może prowadzić do powtarzalności i braku
+  różnorodności w szyfrogramie. W trybie CBC każdy blok danych jest XOR-owany z
+  poprzednim zaszyfrowanym blokiem (pierwszy z wektorem inicjalizacji IV), co
+  sprawia, że każdy blok zależy od poprzedniego, a IV musi być losowy, by
+  zapobiec analizie wzorców. W OFB DES działa jako szyfr strumieniowy: OFB
+  działa na wygenerowanym strumieniu pseudolosującym tworzonym na podstawie
+  zaszyfrowanego IV i klucza który jest XOR-owany z tekstem jawnym.
+</p>
+
+<!-- Formularz do szyfrowania/deszyfrowania ręcznego -->
+<div class="form-container">
+  <div class="form-column">
+    <h2>Dane wprowadzane ręcznie:</h2>
+    <form method="POST" action="/szyfrowanie_des">
+      <!-- Pole do wprowadzenia tekstu -->
+      <label for="text">Wprowadź tekst:</label>
+      <input type="text" id="text" name="text" value="{{ text }}" required />
+      <br /><br />
+
+      <!-- Pole do wprowadzenia klucza DES (8 znaków) -->
+      <label for="key">Wprowadź klucz (8 znaków):</label>
+      <input
+        type="text"
+        id="key"
+        name="key"
+        value="{{ key }}"
+        maxlength="8"
+        required
+      />
+      <br /><br />
+
+      <!-- Wybór trybu pracy DES -->
+      <label for="mode">Wybierz tryb pracy DES:</label>
+      <select id="mode" name="mode" required onchange="toggleIvField()">
+        <option value="ECB" {% if mode == 'ECB' %}selected{% endif %}>ECB</option>
+        <option value="CBC" {% if mode == 'CBC' %}selected{% endif %}>CBC</option>
+        <option value="OFB" {% if mode == 'OFB' %}selected{% endif %}>OFB</option>
+      </select>
+      <br /><br />
+
+      <!-- Pole do wprowadzenia wektora inicjalizacji (IV) dla trybów CBC i OFB -->
+      <div id="ivField" style="display: none">
+        <label for="iv">Wektor inicjalizacji (IV) - 8 znaków:</label>
+        <input type="text" id="iv" name="iv" value="{{ iv }}" maxlength="8" />
+        <br /><br />
+      </div>
+
+      <!-- Wybór operacji: szyfruj lub deszyfruj -->
+      <label for="operation">Wybierz operację:</label>
+      <select id="operation" name="operation" required>
+        <option value="szyfruj">Szyfruj</option>
+        <option value="deszyfruj">Deszyfruj</option>
+      </select>
+      <br /><br />
+
+      <!-- Przycisk do wykonania operacji -->
+      <input type="submit" value="Wykonaj" style="width: 200px" />
+    </form>
+    
+    <!-- Wyświetlanie wyniku operacji, jeśli istnieje -->
+    {% if result %}
+    <h2 class="success-message">Wynik: {{ result }}</h2>
+    {% endif %}
+  </div>
+
+  <!-- Formularz do szyfrowania/deszyfrowania plików z dowolnym formatem z kodowaniem Base64 -->
+  <div class="form-column">
+    <h2>Pliki dowolnego formatu (Base64)</h2>
+
+    <form
+      method="POST"
+      action="/szyfrowanie_base64_des"
+      enctype="multipart/form-data"
+    >
+      <!-- Pole do wyboru pliku do szyfrowania/deszyfrowania -->
+      <label for="file_base64">Wybierz plik do zaszyfrowania:</label>
+      <input type="file" id="file_base64" name="file_base64" required />
+      <br /><br />
+
+      <!-- Pole do wprowadzenia klucza DES (8 znaków) -->
+      <label for="key_base64">Wprowadź klucz (8 znaków):</label>
+      <input
+        type="text"
+        id="key_base64"
+        name="key_base64"
+        maxlength="8"
+        required
+      />
+      <br /><br />
+
+      <!-- Wybór trybu pracy DES -->
+      <label for="mode_base64">Wybierz tryb pracy DES:</label>
+      <select
+        id="mode_base64"
+        name="mode_base64"
+        required
+        onchange="toggleIvBase64Field()"
+      >
+        <option value="ECB">ECB</option>
+        <option value="CBC">CBC</option>
+        <option value="OFB">OFB</option>
+      </select>
+      <br /><br />
+
+      <!-- Pole do wprowadzenia wektora inicjalizacji (IV) dla trybów CBC i OFB -->
+      <div id="ivBase64Field" style="display: none">
+        <label for="iv_base64">Wektor inicjalizacji (IV) - 8 znaków:</label>
+        <input type="text" id="iv_base64" name="iv_base64" maxlength="8" />
+        <br /><br />
+      </div>
+
+      <!-- Wybór operacji: szyfruj lub deszyfruj -->
+      <label for="operation_base64">Wybierz operację:</label>
+      <select
+        id="operation_base64"
+        name="operation_base64"
+        required
+        onchange="toggleOutputFormatField()"
+      >
+        <option value="szyfruj">Szyfruj</option>
+        <option value="deszyfruj">Deszyfruj</option>
+      </select>
+      <br /><br />
+
+      <!-- Pole do wprowadzenia formatu pliku wynikowego, widoczne tylko przy deszyfrowaniu -->
+      <div id="outputFormatField" style="display: none">
+        <label for="output_format"
+          >Format pliku wynikowego (np. png, jpg, txt):</label
+        >
+        <input
+          type="text"
+          id="output_format"
+          name="output_format"
+          value="txt"
+          required
+        />
+        <br /><br />
+      </div>
+
+      <!-- Przycisk do wykonania operacji -->
+      <input type="submit" value="Wykonaj" style="width: 200px" />
+    </form>
+  </div>
+</div>
+
+<!-- Skrypty JavaScript do togglowania pól formularza -->
+<script>
+  // Funkcja do pokazywania lub ukrywania pola IV w formularzu ręcznym
+  function toggleIvField() {
+    const mode = document.getElementById("mode").value;
+    const ivField = document.getElementById("ivField");
+    ivField.style.display = mode === "CBC" || mode === "OFB" ? "block" : "none";
+  }
+
+  // Funkcja do pokazywania lub ukrywania pola IV w formularzu plików
+  function toggleIvBase64Field() {
+    const mode = document.getElementById("mode_base64").value;
+    const ivBase64Field = document.getElementById("ivBase64Field");
+    ivBase64Field.style.display =
+      mode === "CBC" || mode === "OFB" ? "block" : "none";
+  }
+
+  // Funkcja do pokazywania lub ukrywania pola formatu pliku wynikowego
+  function toggleOutputFormatField() {
+    const operation = document.getElementById("operation_base64").value;
+    const outputFormatField = document.getElementById("outputFormatField");
+    outputFormatField.style.display =
+      operation === "deszyfruj" ? "block" : "none";
+  }
+
+  // Automatyczne wywołanie funkcji przy ładowaniu strony, aby ustawić początkowy stan pól
+  window.onload = function() {
+    toggleIvField();
+    toggleIvBase64Field();
+    toggleOutputFormatField();
+  };
+</script>
+
+{% endblock %}

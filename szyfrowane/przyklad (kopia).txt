@@ -1,0 +1,3 @@
+
+  wykorzystujący 8-bajtowy klucz do przetwarzania danych w blokach 64-bitowych.
+
