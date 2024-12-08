@@ -1,21 +1,17 @@
 {% extends 'base.html' %} {% block content %}
 
 <!-- Informacja o algorytmie RSA -->
+<h2>Szyfrowanie RSA</h2>
+
 <p class="note-text">
-  RSA to popularny algorytm szyfrowania, który zabezpiecza dane dzięki użyciu
-  dwóch kluczy: publicznego do szyfrowania i prywatnego do odszyfrowywania.
-  Działa na zasadzie asymetryczności, co oznacza, że zaszyfrowanej wiadomości
-  nie da się łatwo odszyfrować bez znajomości odpowiedniego klucza prywatnego.
-  Klucz publiczny jest dostępny dla wszystkich, ale klucz prywatny zna tylko
-  właściciel i to on zapewnia bezpieczeństwo danych. Algorytm opiera się na
-  mnożeniu dużych liczb pierwszych, co sprawia, że jest bardzo trudny do
-  złamania bez ogromnych mocy obliczeniowych. RSA jest wykorzystywany w wielu
-  miejscach, np. do szyfrowania danych przesyłanych przez internet (tak jak w
-  HTTPS) oraz do tworzenia podpisów cyfrowych, które potwierdzają autentyczność
-  dokumentów. Choć RSA jest bardzo bezpieczny, jest wolniejszy od szyfrowania
-  symetrycznego i wymaga długich kluczy, aby skutecznie chronić dane. W
-  przyszłości algorytm może być zagrożony przez rozwój komputerów kwantowych,
-  które mogłyby szybciej złamać jego zabezpieczenia.
+  RSA (Rivesta-Shamira-Adlemana) to algorytm szyfrowania, który zabezpiecza dane
+  dzięki użyciu dwóch kluczy: publicznego do szyfrowania i prywatnego do
+  odszyfrowywania. Działa na zasadzie asymetryczności, co oznacza, że
+  zaszyfrowanej wiadomości nie da się odszyfrować bez znajomości odpowiedniego
+  klucza prywatnego. Klucz publiczny jest dostępny dla wszystkich, ale klucz
+  prywatny zna tylko właściciel i to on zapewnia bezpieczeństwo danych. Algorytm
+  opiera się na mnożeniu dużych liczb pierwszych, co sprawia, że jest bardzo
+  trudny do złamania bez ogromnych mocy obliczeniowych.
 </p>
 
 <!-- Sekcja Generowania Kluczy RSA -->
