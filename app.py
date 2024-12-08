@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, send_file, session, redirect, url_for
-from szyfrowanie_cezara import szyfruj_cezara, deszyfruj_cezara
-from szyfrowanie_vigenerea import szyfruj_vigenerea, deszyfruj_vigenerea
+from szyfrowanie_vigenerea import przetworz_pliki_vigenerea, szyfruj_vigenerea, deszyfruj_vigenerea
 from szyfrowanie_rail_fence import szyfruj_rail_fence, deszyfruj_rail_fence
 from szyfrowanie_DES import szyfruj_des, deszyfruj_des
 from szyfrowanie_AES import szyfruj_aes, deszyfruj_aes
@@ -48,26 +47,6 @@ def home():
 
 # ----------------------------------------------------------------------------------------------------------------------------------------
 
-# Strona szyfrowania Cezara
-@app.route('/szyfrowanie_cezara', methods=['GET', 'POST'])
-def szyfrowanie_cezara():
-    result = None
-    if request.method == 'POST':
-        # Pobieranie danych z formularza
-        text = request.form['text']
-        shift = int(request.form['shift'])
-        operation = request.form['operation']
-
-        # Wykonywanie operacji szyfrowania lub deszyfrowania
-        if operation == 'szyfruj':
-            result = szyfruj_cezara(text, shift)
-        elif operation == 'deszyfruj':
-            result = deszyfruj_cezara(text, shift)
-
-    return render_template('szyfrowanie_cezara.html', result=result)
-
-# ----------------------------------------------------------------------------------------------------------------------------------------
-
 # Strona szyfrowania Vigenère'a
 @app.route('/szyfrowanie_vigenerea', methods=['GET', 'POST'])
 def szyfrowanie_vigenerea():
@@ -87,6 +66,29 @@ def szyfrowanie_vigenerea():
             result = deszyfruj_vigenerea(text, key)
 
     return render_template('szyfrowanie_vigenerea.html', result=result, text=text, key=key, operation=operation)
+
+# Strona do przesyłania pliku tekstowego do szyfrowania/deszyfrowania
+@app.route('/szyfrowanie_vigenerea_file', methods=['POST'])
+def szyfrowanie_vigenerea_file():
+    result = None
+    file_result = None
+    key_file, operation_file = "", "szyfruj"
+
+    if request.method == 'POST':
+        # Pobieranie pliku i klucza z formularza
+        uploaded_file = request.files.get('file')
+        key_file = request.form.get('key_file', '')
+        operation_file = request.form.get('operation_file', 'szyfruj')
+
+        if uploaded_file:
+            # Zapisanie pliku na serwerze
+            file_path = f"./uploads/{uploaded_file.filename}"
+            uploaded_file.save(file_path)
+
+            # Wykonanie operacji szyfrowania/deszyfrowania
+            file_result = przetworz_pliki_vigenerea(file_path, key_file, szyfruj_vigenerea if operation_file == 'szyfruj' else deszyfruj_vigenerea, operation_file)
+
+    return render_template('szyfrowanie_vigenerea.html', result=result, file_result=file_result, key_file=key_file, operation_file=operation_file)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------
 
