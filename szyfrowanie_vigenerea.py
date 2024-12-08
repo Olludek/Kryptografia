@@ -55,25 +55,39 @@ def deszyfruj_vigenerea(text, key):
     return ''.join(result)
 
 # Funkcja do szyfrowania lub deszyfrowania pliku za pomocą szyfru Vigenère'a
-def przetworz_pliki_vigenerea(file_path, key, operation_func):
+def przetworz_pliki_vigenerea(file_path, key, operation_func, operation_type):
     """
     Przetwarza plik tekstowy, szyfrując lub deszyfrując jego zawartość za pomocą szyfru Vigenère'a.
     
     :param file_path: Ścieżka do pliku tekstowego.
     :param key: Klucz szyfrujący/deszyfrujący.
     :param operation_func: Funkcja operacji (szyfruj_vigenerea lub deszyfruj_vigenerea).
+    :param operation_type: Typ operacji ('szyfruj' lub 'deszyfruj').
     :return: Ścieżka do przetworzonego pliku.
     """
     # Odczytanie zawartości pliku
     with open(file_path, 'r', encoding='utf-8') as file:
         content = file.read()
-    # Przetworzenie zawartości za pomocą wybranej funkcji
-    result = operation_func(content, key)
+
+    # Wybór funkcji operacji na podstawie typu operacji
+    if operation_type == 'szyfruj':
+        result = operation_func(content, key)
+    elif operation_type == 'deszyfruj':
+        result = deszyfruj_vigenerea(content, key)
+    else:
+        raise ValueError("Nieprawidłowy typ operacji")
+
+    # Ustalenie odpowiedniego sufiksu na podstawie typu operacji
+    if operation_type == 'szyfruj':
+        suffix = '_encrypted.txt'
+    elif operation_type == 'deszyfruj':
+        suffix = '_decrypted.txt'
     
-    # Tworzenie ścieżki do nowego pliku z dodanym sufiksem
-    encrypted_file_path = f"{file_path}_encrypted.txt"
+    # Tworzenie ścieżki do nowego pliku z odpowiednim sufiksem
+    encrypted_file_path = f"uploads/{file_path.split('/')[-1]}{suffix}"
+
     # Zapisanie przetworzonej zawartości do nowego pliku
     with open(encrypted_file_path, 'w', encoding='utf-8') as file:
         file.write(result)
-    
+
     return encrypted_file_path  # Zwrócenie ścieżki do przetworzonego pliku
