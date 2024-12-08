@@ -4,7 +4,6 @@
 <!-- Informacja o szyfrze Vigenère'a -->
 <h2>Szyfrowanie Vigenère'a</h2>
 
-
 <p class="note-text">
   Szyfr Vigenère'a to metoda szyfrowania, która wykorzystuje
   klucz do przesunięcia liter w tekście. Klucz ten jest w postaci słowa lub
@@ -47,7 +46,6 @@
 <br />
 
 <!-- Formularz do szyfrowania/deszyfrowania pliku tekstowego -->
-<!-- Formularz do szyfrowania/deszyfrowania pliku tekstowego -->
 <div class="form-full-width">
   <h2>Przesłany plik txt:</h2>
   <form method="POST" action="/szyfrowanie_vigenerea_file" enctype="multipart/form-data">
@@ -75,9 +73,12 @@
 
   <!-- Informacja o przetworzeniu pliku, jeśli istnieje -->
   {% if file_result %}
-  <h2 class="success-message">Plik został przetworzony i umieszczony w folderze uploads. </h2>
+    {% if operation_file == 'szyfruj' %}
+      <h2 class="success-message">Plik został zaszyfrowany i umieszczony w folderze uploads.</h2>
+    {% elif operation_file == 'deszyfruj' %}
+      <h2 class="success-message">Plik został deszyfrowany i umieszczony w folderze uploads.</h2>
+    {% endif %}
   {% endif %}
 </div>
-
 
 {% endblock %}
