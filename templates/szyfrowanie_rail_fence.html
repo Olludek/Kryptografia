@@ -4,13 +4,12 @@
 <h2>Szyfr Rail Fence</h2>
 
 <p class="note-text">
-  Szyfr Rail Fence, czyli szyfr przeskoku, to metoda szyfrowania, w której tekst
-  zapisuje się w zygzakowatym wzorze na kilku poziomach zwanych szynami.
-  Użytkownik wybiera liczbę szyn, co wpływa na sposób rozmieszczenia liter –
-  zapisuje się je od góry do dołu, a następnie z powrotem do góry, tworząc wzór
-  przypominający literę "V". Po zapisaniu tekstu w ten sposób odczytuje się go
-  poziomami, co tworzy zaszyfrowaną wersję wiadomości. Szyfr Rail Fence jest
-  prosty, ale skutecznie ilustruje podstawy szyfrowania.
+  Szyfr Rail Fence, czyli inaczej szyfr przeskoku, to metoda szyfrowania, w
+  której tekst zapisuje się w zygzakowatym wzorze na kilku poziomach zwanych
+  szynami. Użytkownik wybiera liczbę szyn, co wpływa na sposób rozmieszczenia
+  liter – zapisuje się je od góry do dołu, a następnie z powrotem od góry,
+  tworząc wzór przypominający literę "V". Po zapisaniu tekstu w ten sposób
+  odczytuje się go poziomami, co tworzy zaszyfrowaną wersję wiadomości.
 </p>
 
 <!-- Formularz do szyfrowania/deszyfrowania ręcznego -->
@@ -81,14 +80,23 @@
     <!-- Wybór operacji: szyfruj lub deszyfruj -->
     <label for="operation_file">Wybierz operację:</label>
     <select id="operation_file" name="operation_file" required>
-      <option value="szyfruj">Szyfruj</option>
-      <option value="deszyfruj">Deszyfruj</option>
+      <option value="szyfruj" {% if operation_file == 'szyfruj' %}selected{% endif %}>Szyfruj</option>
+      <option value="deszyfruj" {% if operation_file == 'deszyfruj' %}selected{% endif %}>Deszyfruj</option>
     </select>
     <br /><br />
 
     <!-- Przycisk do szyfrowania i pobrania pliku -->
-    <input type="submit" value="Szyfruj i pobierz plik" style="width: 200px" />
+    <input type="submit" value="Wykonaj i pobierz plik" style="width: 200px" />
   </form>
+
+  <!-- Wyświetlanie wiadomości o sukcesie po operacji -->
+  {% if operation_file %}
+    {% if operation_file == 'szyfruj' %}
+      <h2 class="success-message">Plik został zaszyfrowany i umieszczony w folderze uploads.</h2>
+    {% elif operation_file == 'deszyfruj' %}
+      <h2 class="success-message">Plik został deszyfrowany i umieszczony w folderze uploads.</h2>
+    {% endif %}
+  {% endif %}
 </div>
 
 {% endblock %}

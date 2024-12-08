@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, send_file, session, redirect, url_for
 from szyfrowanie_vigenerea import przetworz_pliki_vigenerea, szyfruj_vigenerea, deszyfruj_vigenerea
-from szyfrowanie_rail_fence import szyfruj_rail_fence, deszyfruj_rail_fence
+from szyfrowanie_rail_fence import szyfruj_rail_fence, deszyfruj_rail_fence, przetworz_pliki_rail_fence
 from szyfrowanie_DES import szyfruj_des, deszyfruj_des
 from szyfrowanie_AES import szyfruj_aes, deszyfruj_aes
 from szyfrowanie_diffie_hellman import generuj_klucz_publiczny, generuj_wspolny_klucz
@@ -11,6 +11,8 @@ from certyfikat import certyfikat_bp  # Import nowego blueprintu
 
 import os
 import base64
+from werkzeug.utils import secure_filename
+
 
 # Inicjalizacja aplikacji Flask
 app = Flask(__name__)
@@ -111,6 +113,35 @@ def szyfrowanie_rail_fence():
             result, visualization = deszyfruj_rail_fence(text, int(key))
 
     return render_template('szyfrowanie_rail_fence.html', result=result, visualization=visualization, text=text, key=key, operation=operation)
+
+# Strona szyfrowania Rail Fence - obsługuje pliki
+@app.route('/szyfrowanie_rail_fence_file', methods=['POST'])
+def szyfrowanie_rail_fence_file():
+    result = None
+    processed_file_path = None
+    key_file = ""
+    operation_file = "szyfruj"  # Domyślnie ustawione na szyfrowanie
+
+    if request.method == 'POST':
+        # Pobieranie pliku i pozostałych danych z formularza
+        file = request.files.get('file')
+        key_file = request.form.get('key_file', '')
+        operation_file = request.form.get('operation_file', 'szyfruj')
+
+        if file:
+            # Zapisywanie pliku na serwerze (do folderu uploads)
+            filename = secure_filename(file.filename)  # Bezpieczne nazwy plików
+            file_path = os.path.join(UPLOAD_FOLDER, filename)  # Ścieżka do pliku
+            file.save(file_path)  # Zapisanie pliku na serwerze
+
+            # Przetwarzanie pliku (szyfrowanie lub deszyfrowanie)
+            if operation_file == 'szyfruj':
+                processed_file_path = przetworz_pliki_rail_fence(file_path, int(key_file), szyfruj_rail_fence)
+            elif operation_file == 'deszyfruj':
+                processed_file_path = przetworz_pliki_rail_fence(file_path, int(key_file), deszyfruj_rail_fence)
+
+    return render_template('szyfrowanie_rail_fence.html', result=result, key_file=key_file, operation_file=operation_file)
+
 
 # ----------------------------------------------------------------------------------------------------------------------------------------
 
