@@ -9,8 +9,8 @@ def szyfruj_aes(data, key, mode='ECB', iv=None):
     
     :param data: Tekst do zaszyfrowania (string).
     :param key: Klucz szyfrujący (16, 24 lub 32 znaki).
-    :param mode: Tryb pracy AES (ECB, CBC, OFB, CFB).
-    :param iv: Wektor inicjalizacji (IV) - wymagany dla trybów CBC, OFB i CFB.
+    :param mode: Tryb pracy AES (ECB, CBC, OFB).
+    :param iv: Wektor inicjalizacji (IV) - wymagany dla trybów CBC, OFB.
     :return: Zaszyfrowane dane w formacie Base64 (string).
     """
     # Konwersja klucza i danych na bajty
@@ -26,8 +26,6 @@ def szyfruj_aes(data, key, mode='ECB', iv=None):
         cipher = AES.new(key, AES.MODE_CBC, iv)
     elif mode == 'OFB':
         cipher = AES.new(key, AES.MODE_OFB, iv)
-    elif mode == 'CFB':
-        cipher = AES.new(key, AES.MODE_CFB, iv)
 
     # Szyfrowanie danych z odpowiednim paddingiem
     encrypted_data = cipher.encrypt(pad(data, AES.block_size))
@@ -42,8 +40,8 @@ def deszyfruj_aes(data, key, mode='ECB', iv=None):
     
     :param data: Zaszyfrowane dane w formacie Base64 (string).
     :param key: Klucz deszyfrujący (16, 24 lub 32 znaki).
-    :param mode: Tryb pracy AES (ECB, CBC, OFB, CFB).
-    :param iv: Wektor inicjalizacji (IV) - wymagany dla trybów CBC, OFB i CFB.
+    :param mode: Tryb pracy AES (ECB, CBC, OFB).
+    :param iv: Wektor inicjalizacji (IV) - wymagany dla trybów CBC, OFB.
     :return: Odszyfrowane dane jako string.
     """
     # Konwersja klucza na bajty
@@ -60,8 +58,7 @@ def deszyfruj_aes(data, key, mode='ECB', iv=None):
         cipher = AES.new(key, AES.MODE_CBC, iv)
     elif mode == 'OFB':
         cipher = AES.new(key, AES.MODE_OFB, iv)
-    elif mode == 'CFB':
-        cipher = AES.new(key, AES.MODE_CFB, iv)
+
 
     # Deszyfrowanie danych
     decrypted_data = cipher.decrypt(data)

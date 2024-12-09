@@ -1,0 +1,121 @@
+{% extends 'base.html' %} {% block content %}
+
+<!-- Informacja o szyfrze HMAC z SHA-256 -->
+<h2>Generowanie HMAC z SHA-256</h2>
+
+<p class="note-text">
+  HMAC (Hash-based Message Authentication Code) jest algorytmem wykorzystywanym
+  do zapewnienia integralności i autentyczności wiadomości. W tym przypadku
+  wykorzystamy algorytm SHA-256 do wygenerowania kodu HMAC dla podanego tekstu i
+  klucza.
+</p>
+
+<!-- Formularz do generowania HMAC -->
+<div class="form-full-width">
+  <h2>Generowanie HMAC:</h2>
+  <form method="POST" action="/szyfrowanie_hmac">
+    <!-- Pole do wprowadzenia tekstu -->
+    <label for="text">Wprowadź tekst:</label>
+
+    <input
+      type="text"
+      id="text"
+      name="text"
+      value="{{ text }}"
+      required
+      style="width: 455px"
+    />
+    <br /><br />
+
+    <!-- Pole do wprowadzenia klucza -->
+    <label for="key">Wprowadź klucz:</label>
+    <input
+      type="text"
+      id="key"
+      name="key"
+      value="{{ key }}"
+      required
+      style="width: 455px"
+    />
+    <br /><br />
+
+    <!-- Przycisk do wykonania operacji -->
+    <input type="submit" value="Generuj HMAC" style="width: 200px" />
+  </form>
+
+  <!-- Wyświetlanie wygenerowanego HMAC w formularzu -->
+  {% if result %}
+  <br />
+  <label for="generated_hmac">Wygenerowany HMAC:</label>
+  <input
+    type="text"
+    id="generated_hmac"
+    name="generated_hmac"
+    value="{{ result }}"
+    readonly
+    class="generated-hmac-box"
+  />
+  {% endif %}
+</div>
+
+<br />
+
+<!-- Formularz do weryfikacji HMAC -->
+<div class="form-full-width">
+  <h2>Weryfikacja HMAC:</h2>
+  <form method="POST" action="/weryfikacja_hmac">
+    <!-- Pole do wprowadzenia tekstu -->
+    <label for="verify_text">Wprowadź tekst:</label>
+    <input
+      type="text"
+      id="verify_text"
+      name="verify_text"
+      value="{{ verify_text }}"
+      required
+      style="width: 455px"
+    />
+    <br /><br />
+
+    <!-- Pole do wprowadzenia klucza -->
+    <label for="verify_key">Wprowadź klucz:</label>
+    <input
+      type="text"
+      id="verify_key"
+      name="verify_key"
+      value="{{ verify_key }}"
+      required
+      style="width: 455px"
+    />
+    <br /><br />
+
+    <!-- Pole do wprowadzenia wygenerowanego HMAC -->
+    <label for="verify_hmac">Wprowadź wygenerowany HMAC:</label>
+    <input
+      type="text"
+      id="verify_hmac"
+      name="verify_hmac"
+      value="{{ verify_hmac }}"
+      required
+      style="width: 600px"
+    />
+    <br /><br />
+
+    <!-- Przycisk do weryfikacji -->
+    <input type="submit" value="Weryfikuj" style="width: 200px" />
+  </form>
+
+  <!-- Wyświetlanie komunikatu o sukcesie lub błędzie -->
+  {% if verify_result %} {% if verify_result == 'success' %}
+  <h2 class="success-message">
+    Weryfikacja zakończona sukcesem: Wiadomość jest integralna i pochodzi od
+    zaufanego nadawcy.
+  </h2>
+  {% elif verify_result == 'error' %}
+  <h2 class="error-message">
+    Błąd weryfikacji: Wiadomość została zmieniona lub pochodzi od nieznanego
+    nadawcy.
+  </h2>
+  {% endif %} {% endif %}
+</div>
+
+{% endblock %}

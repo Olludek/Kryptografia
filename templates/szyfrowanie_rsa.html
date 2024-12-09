@@ -94,6 +94,11 @@
   </form>
 </div>
 
+<!-- Wyświetlanie komunikatu o sukcesie -->
+{% if success_message %}
+<div class="success-message">{{ success_message }}</div>
+{% endif %}
+
 <!-- Skrypt JavaScript do obsługi formularza ręcznego -->
 <script>
   // Funkcja do obsługi przesyłania formularza ręcznego

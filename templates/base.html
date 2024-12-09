@@ -225,6 +225,38 @@
         width: 100%;
         resize: vertical;
       }
+
+      /* Stylowanie dla wygenerowanego HMAC */
+      .generated-hmac-box {
+        width: 65%;
+        height: 60px;
+        padding: 10px;
+        font-size: 16px;
+        font-family: monospace;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        color: #333;
+        white-space: pre-wrap; /* Obsługuje łamanie długich ciągów znaków */
+        word-wrap: break-word; /* Zawija długie słowa */
+        transition: all 0.3s ease;
+        text-align: center;
+      }
+
+      /* Efekt na hover - lekkie podświetlenie */
+      .generated-hmac-box:hover {
+        border-color: #6c757d;
+        background-color: #f1f1f1;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Wyrównanie tekstu w okienku na środku */
+      .generated-hmac-box:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+      }
     </style>
   </head>
   <body>
@@ -241,6 +273,7 @@
         <a href="/szyfrowanie_rsa"> RSA </a>
         <a href="/podpis_cyfrowy"> Podpis cyfrowy </a>
         <a href="/certyfikat"> Certyfikaty </a>
+        <a href="/szyfrowanie_hmac"> HMAC </a>
       </div>
 
       <div class="content">{% block content %}{% endblock %}</div>

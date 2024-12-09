@@ -7,6 +7,8 @@ from szyfrowanie_diffie_hellman import generuj_klucz_publiczny, generuj_wspolny_
 from szyfrowanie_rsa import generuj_klucze, szyfruj_rsa, deszyfruj_rsa
 from podpis_cyfrowy import generate_rsa_keys, sign_data, verify_signature, hash_file
 from certyfikat import certyfikat_bp  # Import nowego blueprintu
+from szyfrowanie_hmac import generuj_hmac_sha256, weryfikuj_hmac_sha256
+
 
 
 import os
@@ -167,7 +169,6 @@ def szyfrowanie_des():
 
     return render_template('szyfrowanie_DES.html', result=result, text=text, key=key, mode=mode, iv=iv, operation=operation)
 
-# ----------------------------------------------------------------------------------------------------------------------------------------
 
 # Szyfrowanie plików DES z kodowaniem base64
 @app.route('/szyfrowanie_base64_des', methods=['POST'])
@@ -178,6 +179,8 @@ def szyfrowanie_base64_des():
     iv = request.form.get('iv_base64', None)
     operation = request.form['operation_base64']
     output_format = request.form.get('output_format', 'txt')  # Domyślny format .txt
+
+    operation_file = None  # Zmienna do kontrolowania komunikatu
 
     if operation == 'szyfruj' and file:
         # Zapisywanie przesłanego pliku
@@ -196,8 +199,8 @@ def szyfrowanie_base64_des():
         with open(encrypted_file_path, 'w', encoding='utf-8') as f:
             f.write(encrypted_content)
 
-        # Wysyłanie zaszyfrowanego pliku do użytkownika
-        return send_file(encrypted_file_path, as_attachment=True)
+        # Dodanie komunikatu sukcesu
+        operation_file = f'Plik został zaszyfrowany i umieszczony w folderze uploads'
 
     elif operation == 'deszyfruj' and file:
         # Zapisywanie przesłanego pliku
@@ -216,9 +219,19 @@ def szyfrowanie_base64_des():
         with open(original_file_path, 'wb') as f:
             f.write(base64.b64decode(decrypted_content))
 
-        # Wysyłanie odszyfrowanego pliku do użytkownika
-        return send_file(original_file_path, as_attachment=True)
+        # Dodanie komunikatu sukcesu
+        operation_file = f'Plik został deszyfrowany i umieszczony w folderze uploads'
 
+    # Po zakończeniu operacji zwracamy odpowiedni komunikat i dane formularza
+    return render_template(
+        'szyfrowanie_DES.html',
+        operation_file=operation_file,
+        key=key,
+        mode=mode,
+        iv=iv,
+        operation=operation,
+        output_format=output_format
+    )
 # ----------------------------------------------------------------------------------------------------------------------------------------
 
 # Strona szyfrowania AES - ręczne wprowadzanie
@@ -258,6 +271,8 @@ def szyfrowanie_base64_aes():
     operation = request.form['operation_base64']
     output_format = request.form.get('output_format', 'txt')  # Domyślny format .txt
 
+    operation_file = None  # Zmienna do kontrolowania komunikatu
+
     if operation == 'szyfruj' and file:
         # Zapisywanie przesłanego pliku
         file_path = os.path.join(UPLOAD_FOLDER, file.filename)
@@ -271,12 +286,12 @@ def szyfrowanie_base64_aes():
         encrypted_content = szyfruj_aes(base64_content, key, mode, iv)
 
         # Zapisywanie zaszyfrowanej zawartości do pliku tekstowego
-        encrypted_file_path = f"{file_path}_encrypted.txt"
+        encrypted_file_path = os.path.join(UPLOAD_FOLDER, f"{file.filename}_encrypted.txt")
         with open(encrypted_file_path, 'w', encoding='utf-8') as f:
             f.write(encrypted_content)
 
-        # Wysyłanie zaszyfrowanego pliku do użytkownika
-        return send_file(encrypted_file_path, as_attachment=True)
+        # Dodanie komunikatu sukcesu
+        operation_file = f'Plik został zaszyfrowany i umieszczony w folderze uploads'
 
     elif operation == 'deszyfruj' and file:
         # Zapisywanie przesłanego pliku
@@ -291,21 +306,17 @@ def szyfrowanie_base64_aes():
         decrypted_content = deszyfruj_aes(encrypted_content, key, mode, iv)
 
         # Dekodowanie z base64 do oryginalnego formatu
-        original_file_path = f"{file_path}_decrypted.{output_format}"
+        original_file_path = os.path.join(UPLOAD_FOLDER, f"{file.filename}_decrypted.{output_format}")
         with open(original_file_path, 'wb') as f:
             f.write(base64.b64decode(decrypted_content))
 
-        # Wysyłanie odszyfrowanego pliku do użytkownika
-        return send_file(original_file_path, as_attachment=True)
+        # Dodanie komunikatu sukcesu
+        operation_file = f'Plik został deszyfrowany i umieszczony w folderze uploads'
 
-    # Renderowanie strony z aktualnymi danymi formularza
+    # Po zakończeniu operacji zwracamy odpowiedni komunikat
     return render_template(
-        'szyfrowanie_AES.html',
-        key_base64=key,
-        mode_base64=mode,
-        iv_base64=iv,
-        operation_base64=operation,
-        output_format=output_format
+        'szyfrowanie_AES.html', 
+        operation_file=operation_file
     )
 
 # ----------------------------------------------------------------------------------------------------------------------------------------
@@ -397,7 +408,8 @@ def szyfrowanie_rsa_file():
             with open(encrypted_file_path, 'w', encoding='utf-8') as f:
                 f.write(encrypted_data)
             # Wysyłanie zaszyfrowanego pliku do użytkownika
-            return send_file(encrypted_file_path, as_attachment=True)
+            success_message = f"Plik został zaszyfrowany i umieszczony w folderze uploads"
+            return render_template('szyfrowanie_rsa.html', success_message=success_message, private_key=private_key, public_key=public_key)
 
         elif operation == 'deszyfruj' and private_key:
             # Odczytywanie zaszyfrowanych danych z pliku
@@ -411,7 +423,8 @@ def szyfrowanie_rsa_file():
             with open(decrypted_file_path, 'w', encoding='utf-8') as f:
                 f.write(decrypted_data)
             # Wysyłanie odszyfrowanego pliku do użytkownika
-            return send_file(decrypted_file_path, as_attachment=True)
+            success_message = f"Plik został deszyfrowany i umieszczony w folderze uploads"
+            return render_template('szyfrowanie_rsa.html', success_message=success_message, private_key=private_key, public_key=public_key)
 
     # Przekierowanie do strony szyfrowania RSA w przypadku błędu
     return redirect(url_for('szyfrowanie_rsa'))
@@ -489,6 +502,45 @@ def weryfikuj_podpis():
     
     return render_template('podpis_cyfrowy.html', weryfikacja=wynik)
 
+# ------------------------------------------------------------------------------------------------------------------------------------------
+# Strona generowania HMAC
+@app.route('/szyfrowanie_hmac', methods=['GET', 'POST'])
+def szyfrowanie_hmac():
+    result = None
+    text, key = "", ""
+
+    if request.method == 'POST':
+        # Pobieranie danych z formularza
+        text = request.form.get('text', '')
+        key = request.form.get('key', '')
+        
+        # Generowanie HMAC
+        if text and key:
+            result = generuj_hmac_sha256(text, key)
+
+    return render_template('szyfrowanie_hmac.html', result=result, text=text, key=key)
+
+
+# Strona weryfikacji HMAC
+@app.route('/weryfikacja_hmac', methods=['GET', 'POST'])
+def weryfikacja_hmac():
+    verify_result = None
+    verify_text, verify_key, verify_hmac = "", "", ""
+
+    if request.method == 'POST':
+        # Pobieranie danych z formularza
+        verify_text = request.form.get('verify_text', '')
+        verify_key = request.form.get('verify_key', '')
+        verify_hmac = request.form.get('verify_hmac', '')
+
+        # Weryfikacja HMAC
+        if verify_text and verify_key and verify_hmac:
+            if weryfikuj_hmac_sha256(verify_text, verify_key, verify_hmac):
+                verify_result = 'success'
+            else:
+                verify_result = 'error'
+
+    return render_template('szyfrowanie_hmac.html', verify_result=verify_result, verify_text=verify_text, verify_key=verify_key, verify_hmac=verify_hmac)
 # ------------------------------------------------------------------------------------------------------------------------------------------
 
 # Rejestracja blueprintu dla certyfikatów

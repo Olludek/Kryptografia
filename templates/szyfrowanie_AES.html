@@ -5,15 +5,14 @@
 <h2>Szyfrowanie AES</h2>
 
 <p class="note-text">
-  AES (Advanced Encryption Standard) to symetryczny algorytm szyfrowania
+  AES (Advanced Encryption Standard) to algorytm szyfrowania
   blokowego, który przekształca dane w bloki o stałym rozmiarze, gwarantując ich
   bezpieczeństwo. Wymaga klucza o długości 16, 24 lub 32 bajtów, co decyduje o
   poziomie bezpieczeństwa szyfrowania. AES obsługuje różne tryby pracy: ECB,
-  który szyfruje każdy blok niezależnie, oraz CBC, OFB i CFB, które zapewniają
+  który szyfruje każdy blok niezależnie, oraz CBC, OFB, które zapewniają
   dodatkowe bezpieczeństwo poprzez włączenie wektora inicjalizacji (IV) –
   używanego do losowania wyników, aby zaszyfrowany tekst był trudniejszy do
-  złamania. Dzięki tym trybom AES jest niezwykle elastyczny, oferując wysoki
-  poziom ochrony w zależności od potrzeb i zastosowania.
+  złamania.
 </p>
 
 <!-- Formularz do szyfrowania/deszyfrowania ręcznego -->
@@ -44,11 +43,10 @@
         <option value="ECB" {% if mode == "ECB" %}selected{% endif %}>ECB</option>
         <option value="CBC" {% if mode == "CBC" %}selected{% endif %}>CBC</option>
         <option value="OFB" {% if mode == "OFB" %}selected{% endif %}>OFB</option>
-        <option value="CFB" {% if mode == "CFB" %}selected{% endif %}>CFB</option>
       </select>
       <br /><br />
 
-      <!-- Pole do wprowadzenia wektora inicjalizacji (IV) dla trybów CBC, OFB i CFB -->
+      <!-- Pole do wprowadzenia wektora inicjalizacji (IV) dla trybów CBC, OFB -->
       <div id="ivField" style="display: none">
         <label for="iv">Wektor inicjalizacji (IV) - 16 znaków:</label>
         <input type="text" id="iv" name="iv" maxlength="16" value="{{ iv }}" />
@@ -112,7 +110,7 @@
       </select>
       <br /><br />
 
-      <!-- Pole do wprowadzenia wektora inicjalizacji (IV) dla trybów CBC, OFB i CFB -->
+      <!-- Pole do wprowadzenia wektora inicjalizacji (IV) dla trybów CBC, OFB -->
       <div id="ivBase64Field" style="display: none">
         <label for="iv_base64">Wektor inicjalizacji (IV) - 16 znaków:</label>
         <input type="text" id="iv_base64" name="iv_base64" maxlength="16" />
@@ -150,6 +148,11 @@
       <!-- Przycisk do wykonania operacji -->
       <input type="submit" value="Wykonaj" style="width: 200px" />
     </form>
+    
+    <!-- Wyświetlanie wyniku operacji, jeśli istnieje -->
+    {% if operation_file %}
+      <h2 class="success-message">{{ operation_file }}</h2>
+    {% endif %}
   </div>
 </div>
 
