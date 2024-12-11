@@ -1,4 +1,5 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %} 
+{% block content %}
 
 <!-- Informacja o podpisie cyfrowym -->
 <h2>Podpis cyfrowy</h2>
@@ -13,11 +14,7 @@
 <!-- Sekcja Generowania Podpisu Cyfrowego -->
 <div class="form-full-width">
   <h2>Generowanie podpisu cyfrowego:</h2>
-  <form
-    method="POST"
-    action="/podpis_cyfrowy/generuj"
-    enctype="multipart/form-data"
-  >
+  <form method="POST" action="/podpis_cyfrowy/generuj" enctype="multipart/form-data">
     <!-- Pole do wyboru pliku PDF -->
     <label for="file">Wybierz plik PDF:</label>
     <input type="file" id="file" name="file" accept=".pdf" required />
@@ -46,31 +43,15 @@
 <!-- Sekcja Weryfikacji Podpisu Cyfrowego -->
 <div class="form-full-width">
   <h2>Weryfikacja podpisu cyfrowego:</h2>
-  <form
-    method="POST"
-    action="/podpis_cyfrowy/weryfikuj"
-    enctype="multipart/form-data"
-  >
+  <form method="POST" action="/podpis_cyfrowy/weryfikuj" enctype="multipart/form-data">
     <!-- Pole do wyboru pliku PDF do weryfikacji -->
     <label for="file_verify">Wybierz plik PDF:</label>
-    <input
-      type="file"
-      id="file_verify"
-      name="file_verify"
-      accept=".pdf"
-      required
-    />
+    <input type="file" id="file_verify" name="file_verify" accept=".pdf" required />
     <br /><br />
 
     <!-- Pole do wklejenia podpisu w formacie Base64 -->
     <label for="podpis_verify">Wklej podpis (base64):</label>
-    <textarea
-      id="podpis_verify"
-      name="podpis_verify"
-      rows="5"
-      cols="80"
-      required
-    ></textarea>
+    <textarea id="podpis_verify" name="podpis_verify" rows="5" cols="80" required></textarea>
     <br /><br />
 
     <!-- Przycisk do weryfikacji podpisu -->
@@ -79,7 +60,9 @@
 
   <!-- Wyświetlanie wyniku weryfikacji, jeśli istnieje -->
   {% if weryfikacja %}
-  <h3 class="success-message">{{ weryfikacja }}</h3>
+  <h3 class="{{ 'error-message' if 'nieprawidłowy' in weryfikacja else 'success-message' }}">
+    {{ weryfikacja }}
+  </h3>
   {% endif %}
 </div>
 
