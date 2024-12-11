@@ -8,8 +8,8 @@ from szyfrowanie_rsa import generuj_klucze, szyfruj_rsa, deszyfruj_rsa
 from podpis_cyfrowy import generate_rsa_keys, sign_data, verify_signature, hash_file
 from certyfikat import certyfikat_bp  # Import nowego blueprintu
 from szyfrowanie_hmac import generuj_hmac_sha256, weryfikuj_hmac_sha256
-
-
+from kod_hamminga import generuj_kod_hamminga
+from kodowanie_huffmana import generuj_kod_huffmana
 
 import os
 import base64
@@ -503,6 +503,11 @@ def weryfikuj_podpis():
     return render_template('podpis_cyfrowy.html', weryfikacja=wynik)
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
+
+# Rejestracja blueprintu dla certyfikatów
+app.register_blueprint(certyfikat_bp)
+
+# ------------------------------------------------------------------------------------------------------------------------------------------
 # Strona generowania HMAC
 @app.route('/szyfrowanie_hmac', methods=['GET', 'POST'])
 def szyfrowanie_hmac():
@@ -542,9 +547,47 @@ def weryfikacja_hmac():
 
     return render_template('szyfrowanie_hmac.html', verify_result=verify_result, verify_text=verify_text, verify_key=verify_key, verify_hmac=verify_hmac)
 # ------------------------------------------------------------------------------------------------------------------------------------------
+# Strona generowania kodu Hamminga
+@app.route('/generuj_kod_hamminga', methods=['GET', 'POST'])
+def generowanie_kod_hamminga():
+    kod_hamminga = None
+    dane = ""
 
-# Rejestracja blueprintu dla certyfikatów
-app.register_blueprint(certyfikat_bp)
+    if request.method == 'POST':
+        dane = request.form.get('dane', '')
+        
+        if dane:
+            # Zamiana ciągu danych na listę bitów [0, 1, 0, 1, ...]
+            dane_bin = [int(bit) for bit in dane if bit in ['0', '1']]
+            if dane_bin:
+                kod_hamminga = generuj_kod_hamminga(dane_bin)
+
+    return render_template('kod_hamminga.html', kod_hamminga=kod_hamminga, dane=dane)
+
+# ------------------------------------------------------------------------------------------------------------------------------------------
+
+@app.route('/generuj_kod_huffmana', methods=['GET', 'POST'])
+def generowanie_kod_huffmana():
+    kodowanie_huffmana = None
+    dane = ""
+    czestotliwosc = None
+    kod_alfabetu = None
+
+    if request.method == 'POST':
+        dane = request.form.get('dane', '')
+        
+        if dane:
+            kod_wynikowy, czestotliwosc, kodowanie = generuj_kod_huffmana(dane)
+
+            # Przygotowanie kodu alfabetu
+            kod_alfabetu = [(litera, kodowanie[litera]) for litera in kodowanie]
+
+            kodowanie_huffmana = kod_wynikowy
+
+    return render_template('kodowanie_huffmana.html', kodowanie_huffmana=kodowanie_huffmana, dane=dane,
+                           czestotliwosc=czestotliwosc, kod_alfabetu=kod_alfabetu)
+
+# ------------------------------------------------------------------------------------------------------------------------------------------
 
 # Uruchomienie aplikacji w trybie debugowania
 if __name__ == '__main__':

@@ -1,0 +1,98 @@
+{% extends 'base.html' %} {% block content %}
+
+<!-- Informacja o kodowaniu Huffmana -->
+<h2>Generowanie kodowania Huffmana</h2>
+
+<p class="note-text">
+  Kodowanie Huffmana to algorytm kompresji bezstratnej, który przypisuje krótsze
+  kody do symboli występujących częściej, a dłuższe do rzadziej pojawiających
+  się. W tej implementacji zastosujemy go do kodowania ciągu tekstowego, a wynik
+  przedstawimy w postaci ciągu bitów.
+</p>
+
+<!-- Formularz do generowania kodowania Huffmana -->
+<div class="form-full-width">
+  <h2>Generowanie kodowania Huffmana:</h2>
+  <form method="POST" action="/generuj_kod_huffmana">
+    <!-- Kontener dla pola formularza i przycisku -->
+    <div class="form-row">
+      <!-- Pole do wprowadzenia danych -->
+      <label for="dane">Wprowadź dane (ciąg tekstowy):</label>
+      <input
+        type="text"
+        id="dane"
+        name="dane"
+        value="{{ dane }}"
+        required
+        style="width: 150px; height: 20px"
+        class="input-field"
+      />
+      <!-- Przycisk do wykonania operacji -->
+      <input
+        type="submit"
+        value="Generuj kodowanie Huffmana"
+        class="submit-button"
+      />
+    </div>
+  </form>
+
+  <!-- Wyświetlanie wygenerowanego kodowania Huffmana -->
+  {% if kodowanie_huffmana %}
+  <br />
+  <label for="generated_code">Wygenerowane kodowanie Huffmana:</label>
+  <input
+    type="text"
+    id="generated_code"
+    name="generated_code"
+    value="{{ kodowanie_huffmana }}"
+    readonly
+    class="generated-huffman-kod"
+  />
+  {% endif %}
+
+  <!-- Wyświetlanie tabeli częstotliwości liter -->
+  {% if czestotliwosc %}
+  <h3>Częstotliwość liter:</h3>
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>Litera</th>
+        <th>Ilość</th>
+        <th>Częstotliwość</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for litera, ilosc, p in czestotliwosc %}
+      <tr>
+        <td>{{ litera }}</td>
+        <td>{{ ilosc }}</td>
+        <td>{{ p }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  <!-- Wyświetlanie tabeli kodu alfabetu -->
+  {% if kod_alfabetu %}
+  <h3>Kodowanie liter w alfabecie:</h3>
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>Litera</th>
+        <th>Kod</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for litera, kod in kod_alfabetu %}
+      <tr>
+        <td>{{ litera }}</td>
+        <td>{{ kod }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+
+{% endblock %}
