@@ -547,25 +547,8 @@ def weryfikacja_hmac():
 
     return render_template('szyfrowanie_hmac.html', verify_result=verify_result, verify_text=verify_text, verify_key=verify_key, verify_hmac=verify_hmac)
 # ------------------------------------------------------------------------------------------------------------------------------------------
-# Strona generowania kodu Hamminga
-@app.route('/generuj_kod_hamminga', methods=['GET', 'POST'])
-def generowanie_kod_hamminga():
-    kod_hamminga = None
-    dane = ""
 
-    if request.method == 'POST':
-        dane = request.form.get('dane', '')
-        
-        if dane:
-            # Zamiana ciągu danych na listę bitów [0, 1, 0, 1, ...]
-            dane_bin = [int(bit) for bit in dane if bit in ['0', '1']]
-            if dane_bin:
-                kod_hamminga = generuj_kod_hamminga(dane_bin)
-
-    return render_template('kod_hamminga.html', kod_hamminga=kod_hamminga, dane=dane)
-
-# ------------------------------------------------------------------------------------------------------------------------------------------
-
+# Strona generowania Kodu Huffmana
 @app.route('/generuj_kod_huffmana', methods=['GET', 'POST'])
 def generowanie_kod_huffmana():
     kodowanie_huffmana = None
@@ -588,6 +571,26 @@ def generowanie_kod_huffmana():
                            czestotliwosc=czestotliwosc, kod_alfabetu=kod_alfabetu)
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
+
+# Strona generowania kodu Hamminga
+@app.route('/generuj_kod_hamminga', methods=['GET', 'POST'])
+def generowanie_kod_hamminga():
+    kod_hamminga = None
+    dane = ""
+
+    if request.method == 'POST':
+        dane = request.form.get('dane', '')
+        
+        if dane:
+            # Zamiana ciągu danych na listę bitów [0, 1, 0, 1, ...]
+            dane_bin = [int(bit) for bit in dane if bit in ['0', '1']]
+            if dane_bin:
+                kod_hamminga = generuj_kod_hamminga(dane_bin)
+
+    return render_template('kod_hamminga.html', kod_hamminga=kod_hamminga, dane=dane)
+
+# ------------------------------------------------------------------------------------------------------------------------------------------
+
 
 # Uruchomienie aplikacji w trybie debugowania
 if __name__ == '__main__':

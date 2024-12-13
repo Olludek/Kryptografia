@@ -34,7 +34,7 @@
       /* Stylowanie dla sidebaru */
       .sidebar {
         width: 200px;
-        height: 950px; /* Dopasowanie do wysokości kontenera pomniejszonej o topbar */
+        height: 950px;
         background-color: #444;
         color: #fff;
         position: absolute;
@@ -43,17 +43,35 @@
         padding-top: 20px;
         box-sizing: border-box;
         text-align: center;
+        border-right: 2px solid #333;
       }
 
+      /* Stylowanie dla linków w sidebar */
       .sidebar a {
         display: block;
         color: #fff;
         padding: 10px;
         text-decoration: none;
+        border-bottom: 1px solid #555;
+        transition: background-color 0.3s ease, padding-left 0.3s ease;
+        margin-bottom: 10px; /* Dodanie odstępu między elementami */
       }
 
+      /* Pierwszy element w sidebar - większy odstęp od reszty */
+      .sidebar a:first-child {
+        margin-top: 30px; /* Większy odstęp dla pierwszego elementu */
+        padding-bottom: 25px;
+      }
+
+      /* Efekt hover na linkach */
       .sidebar a:hover {
         background-color: #555;
+        padding-left: 20px;
+      }
+
+      /* Usunięcie linii dla ostatniego elementu */
+      .sidebar a:last-child {
+        border-bottom: none;
       }
 
       /* Stylowanie dla głównej zawartości */
