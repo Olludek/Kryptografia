@@ -29,3 +29,11 @@ python app.py
 
 Otwórz w przeglądarce - http://127.0.0.1:5000
 ```
+
+## Generowanie pliku wykonywalnego
+
+```
+pip install pyinstaller
+
+pyinstaller --onefile --add-data "templates:templates" app.py
+```
